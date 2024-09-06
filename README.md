@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # HackTricks
 
 <figure><img src=".gitbook/assets/hacktricks.gif" alt=""><figcaption></figcaption></figure>
@@ -77,9 +81,9 @@ Obtén acceso hoy:
 
 ***
 
-### [Pentest-Tools.com](https://pentest-tools.com/?utm_term=jul2024&utm_medium=link&utm_source=hacktricks&utm_campaign=spons) - El kit de herramientas esencial para pruebas de penetración
+### [Pentest-Tools.com](https://pentest-tools.com/?utm\_term=jul2024\&utm\_medium=link\&utm\_source=hacktricks\&utm\_campaign=spons) - El kit de herramientas esencial para pruebas de penetración
 
-<figure><img src="/.gitbook/assets/pentest-tools.svg" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/pentest-tools.svg" alt=""><figcaption></figcaption></figure>
 
 **Configuración disponible instantáneamente para evaluación de vulnerabilidades y pruebas de penetración**. Realiza un pentest completo desde cualquier lugar con más de 20 herramientas y características que van desde la recopilación de información hasta la elaboración de informes. No reemplazamos a los pentesters - desarrollamos herramientas personalizadas, módulos de detección y explotación para darles más tiempo para profundizar, ejecutar shells y divertirse.
 
@@ -101,7 +105,6 @@ Además de lo anterior, WebSec también es un **apoyo comprometido de HackTricks
 
 {% embed url="https://www.youtube.com/watch?v=Zq2JycGDCPM" %}
 
-
 ## Licencia y Descargo de Responsabilidad
 
 Consúltalos en:
@@ -112,12 +115,11 @@ Consúltalos en:
 
 ## Estadísticas de Github
 
-![Estadísticas de HackTricks en Github](https://repobeats.axiom.co/api/embed/68f8746802bcf1c8462e889e6e9302d4384f164b.svg "Imagen de análisis de Repobeats")
-
+![Estadísticas de HackTricks en Github](https://repobeats.axiom.co/api/embed/68f8746802bcf1c8462e889e6e9302d4384f164b.svg)
 
 {% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+Aprende y practica Hacking en AWS:<img src=".gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src=".gitbook/assets/arte.png" alt="" data-size="line">\
+Aprende y practica Hacking en GCP: <img src=".gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src=".gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 

@@ -767,7 +767,7 @@
   * [Stack Canaries](binary-exploitation/common-binary-protections-and-bypasses/stack-canaries/README.md)
     * [BF Forked & Threaded Stack Canaries](binary-exploitation/common-binary-protections-and-bypasses/stack-canaries/bf-forked-stack-canaries.md)
     * [Print Stack Canary](binary-exploitation/common-binary-protections-and-bypasses/stack-canaries/print-stack-canary.md)
-* [Write What Where 2 Exec](binary-exploitation/arbitrary-write-2-exec/README.md)
+* [Write What Where 2 Exec](binary-exploitation/write-what-where-2-exec/README.md)
   * [WWW2Exec - atexit()](binary-exploitation/arbitrary-write-2-exec/www2exec-atexit.md)
   * [WWW2Exec - .dtors & .fini\_array](binary-exploitation/arbitrary-write-2-exec/www2exec-.dtors-and-.fini\_array.md)
   * [WWW2Exec - GOT/PLT](binary-exploitation/arbitrary-write-2-exec/aw2exec-got-plt.md)
