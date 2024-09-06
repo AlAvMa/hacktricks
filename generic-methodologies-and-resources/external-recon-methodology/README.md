@@ -1,25 +1,4 @@
-# Metodología de Reconocimiento Externo
-
-{% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
-
-<details>
-
-<summary>Apoya a HackTricks</summary>
-
-* Revisa los [**planes de suscripción**](https://github.com/sponsors/carlospolop)!
-* **Únete al** 💬 [**grupo de Discord**](https://discord.gg/hRep4RUj7f) o al [**grupo de telegram**](https://t.me/peass) o **síguenos** en **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
-* **Comparte trucos de hacking enviando PRs a los** [**repos de HackTricks**](https://github.com/carlospolop/hacktricks) y [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud).
-
-</details>
-{% endhint %}
-
-<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
-
-Si estás interesado en una **carrera de hacking** y hackear lo inhackeable - **¡estamos contratando!** (_se requiere polaco fluido escrito y hablado_).
-
-{% embed url="https://www.stmcyber.com/careers" %}
+# External Recon Methodology
 
 ## Descubrimientos de activos
 
@@ -48,12 +27,15 @@ Un **AS** consiste en **bloques** de **direcciones IP** que tienen una política
 Es interesante averiguar si la **empresa ha asignado algún ASN** para encontrar sus **rangos de IP.** Será interesante realizar una **prueba de vulnerabilidad** contra todos los **hosts** dentro del **alcance** y **buscar dominios** dentro de estas IPs.\
 Puedes **buscar** por el **nombre** de la empresa, por **IP** o por **dominio** en [**https://bgp.he.net/**](https://bgp.he.net)**.**\
 **Dependiendo de la región de la empresa, estos enlaces podrían ser útiles para recopilar más datos:** [**AFRINIC**](https://www.afrinic.net) **(África),** [**Arin**](https://www.arin.net/about/welcome/region/)**(América del Norte),** [**APNIC**](https://www.apnic.net) **(Asia),** [**LACNIC**](https://www.lacnic.net) **(América Latina),** [**RIPE NCC**](https://www.ripe.net) **(Europa). De todos modos, probablemente toda la** información útil **(rangos de IP y Whois)** ya aparezca en el primer enlace.
+
 ```bash
 #You can try "automate" this with amass, but it's not very recommended
 amass intel -org tesla
 amass intel -asn 8911,50313,394161
 ```
+
 También, la enumeración de subdominios de [**BBOT**](https://github.com/blacklanternsecurity/bbot)**'s** agrega y resume automáticamente los ASN al final del escaneo.
+
 ```bash
 bbot -t tesla.com -f subdomain-enum
 ...
@@ -70,6 +52,7 @@ bbot -t tesla.com -f subdomain-enum
 [INFO] bbot.modules.asn: +----------+---------------------+--------------+----------------+----------------------------+-----------+
 
 ```
+
 Puedes encontrar los rangos de IP de una organización también usando [http://asnlookup.com/](http://asnlookup.com) (tiene API gratuita).\
 Puedes encontrar la IP y ASN de un dominio usando [http://ipv4info.com/](http://ipv4info.com).
 
@@ -90,12 +73,14 @@ Primero que nada, deberías buscar el(los) **dominio(s) principal(es)** de cada 
 ### **DNS inverso**
 
 Como has encontrado todos los rangos de IP de los dominios, podrías intentar realizar **búsquedas de DNS inverso** en esas **IPs para encontrar más dominios dentro del alcance**. Intenta usar algún servidor DNS de la víctima o algún servidor DNS bien conocido (1.1.1.1, 8.8.8.8)
+
 ```bash
 dnsrecon -r <DNS Range> -n <IP_DNS>   #DNS reverse of all of the addresses
 dnsrecon -d facebook.com -r 157.240.221.35/24 #Using facebooks dns
 dnsrecon -r 157.240.221.35/24 -n 1.1.1.1 #Using cloudflares dns
 dnsrecon -r 157.240.221.35/24 -n 8.8.8.8 #Using google dns
 ```
+
 Para que esto funcione, el administrador tiene que habilitar manualmente el PTR.\
 También puedes usar una herramienta en línea para esta información: [http://ptrarchive.com/](http://ptrarchive.com)
 
@@ -112,7 +97,7 @@ Puedes usar herramientas en línea como:
 * [https://drs.whoisxmlapi.com/reverse-whois-search](https://drs.whoisxmlapi.com/reverse-whois-search) - No Gratis (solo **100 gratis** búsquedas)
 * [https://www.domainiq.com/](https://www.domainiq.com) - No Gratis
 
-Puedes automatizar esta tarea usando [**DomLink** ](https://github.com/vysecurity/DomLink) (requiere una clave API de whoxy).\
+Puedes automatizar esta tarea usando [**DomLink** ](https://github.com/vysecurity/DomLink)(requiere una clave API de whoxy).\
 También puedes realizar un descubrimiento automático de reverse whois con [amass](https://github.com/OWASP/Amass): `amass intel -d tesla.com -whois`
 
 **Ten en cuenta que puedes usar esta técnica para descubrir más nombres de dominio cada vez que encuentres un nuevo dominio.**
@@ -133,19 +118,24 @@ Hay algunas páginas y herramientas que te permiten buscar por estos trackers y 
 ### **Favicon**
 
 ¿Sabías que podemos encontrar dominios y subdominios relacionados con nuestro objetivo buscando el mismo hash de icono de favicon? Esto es exactamente lo que hace la herramienta [favihash.py](https://github.com/m4ll0k/Bug-Bounty-Toolz/blob/master/favihash.py) creada por [@m4ll0k2](https://twitter.com/m4ll0k2). Aquí te explicamos cómo usarla:
+
 ```bash
 cat my_targets.txt | xargs -I %% bash -c 'echo "http://%%/favicon.ico"' > targets.txt
 python3 favihash.py -f https://target/favicon.ico -t targets.txt -s
 ```
+
 ![favihash - descubrir dominios con el mismo hash de icono favicon](https://www.infosecmatter.com/wp-content/uploads/2020/07/favihash.jpg)
 
 Dicho de manera simple, favihash nos permitirá descubrir dominios que tienen el mismo hash de icono favicon que nuestro objetivo.
 
 Además, también puedes buscar tecnologías utilizando el hash de favicon como se explica en [**esta publicación de blog**](https://medium.com/@Asm0d3us/weaponizing-favicon-ico-for-bugbounties-osint-and-what-not-ace3c214e139). Eso significa que si conoces el **hash del favicon de una versión vulnerable de una tecnología web** puedes buscar en shodan y **encontrar más lugares vulnerables**:
+
 ```bash
 shodan search org:"Target" http.favicon.hash:116323821 --fields ip_str,port --separator " " | awk '{print $1":"$2}'
 ```
+
 Así es como puedes **calcular el hash del favicon** de una web:
+
 ```python
 import mmh3
 import requests
@@ -158,6 +148,7 @@ fhash = mmh3.hash(favicon)
 print(f"{url} : {fhash}")
 return fhash
 ```
+
 ### **Copyright / Uniq string**
 
 Busca dentro de las páginas web **cadenas que podrían ser compartidas entre diferentes webs en la misma organización**. La **cadena de copyright** podría ser un buen ejemplo. Luego busca esa cadena en **google**, en otros **navegadores** o incluso en **shodan**: `shodan search http.html:"Copyright string"`
@@ -165,10 +156,12 @@ Busca dentro de las páginas web **cadenas que podrían ser compartidas entre di
 ### **CRT Time**
 
 Es común tener un trabajo cron como
+
 ```bash
 # /etc/crontab
 37 13 */10 * * certbot renew --post-hook "systemctl reload nginx"
 ```
+
 para renovar todos los certificados de dominio en el servidor. Esto significa que incluso si la CA utilizada para esto no establece la hora en que se generó en el tiempo de validez, es posible **encontrar dominios que pertenecen a la misma empresa en los registros de transparencia de certificados**.\
 Consulta este [**artículo para más información**](https://swarm.ptsecurity.com/discovering-domains-via-a-time-correlation-attack/).
 
@@ -203,11 +196,6 @@ Verifica algún [toma de dominio](../../pentesting-web/domain-subdomain-takeover
 Si encuentras algún **dominio con una IP diferente** de las que ya encontraste en el descubrimiento de activos, deberías realizar un **escaneo básico de vulnerabilidades** (usando Nessus u OpenVAS) y algún [**escaneo de puertos**](../pentesting-network/#discovering-hosts-from-the-outside) con **nmap/masscan/shodan**. Dependiendo de qué servicios estén en funcionamiento, puedes encontrar en **este libro algunos trucos para "atacarlos"**.\
 _Ten en cuenta que a veces el dominio está alojado dentro de una IP que no es controlada por el cliente, por lo que no está en el alcance, ten cuidado._
 
-<img src="../../.gitbook/assets/i3.png" alt="" data-size="original">\
-**Consejo de bug bounty**: **regístrate** en **Intigriti**, una plataforma premium de **bug bounty creada por hackers, para hackers**! Únete a nosotros en [**https://go.intigriti.com/hacktricks**](https://go.intigriti.com/hacktricks) hoy, y comienza a ganar recompensas de hasta **$100,000**!
-
-{% embed url="https://go.intigriti.com/hacktricks" %}
-
 ## Subdominios
 
 > Conocemos todas las empresas dentro del alcance, todos los activos de cada empresa y todos los dominios relacionados con las empresas.
@@ -221,14 +209,17 @@ Es hora de encontrar todos los posibles subdominios de cada dominio encontrado.
 ### **DNS**
 
 Intentemos obtener **subdominios** de los registros **DNS**. También deberíamos intentar una **Transferencia de Zona** (Si es vulnerable, deberías reportarlo).
+
 ```bash
 dnsrecon -a -d tesla.com
 ```
+
 ### **OSINT**
 
 La forma más rápida de obtener muchos subdominios es buscar en fuentes externas. Las **herramientas** más utilizadas son las siguientes (para mejores resultados, configura las claves de API):
 
 * [**BBOT**](https://github.com/blacklanternsecurity/bbot)
+
 ```bash
 # subdomains
 bbot -t tesla.com -f subdomain-enum
@@ -239,55 +230,77 @@ bbot -t tesla.com -f subdomain-enum -rf passive
 # subdomains + port scan + web screenshots
 bbot -t tesla.com -f subdomain-enum -m naabu gowitness -n my_scan -o .
 ```
+
 * [**Amass**](https://github.com/OWASP/Amass)
+
 ```bash
 amass enum [-active] [-ip] -d tesla.com
 amass enum -d tesla.com | grep tesla.com # To just list subdomains
 ```
+
 * [**subfinder**](https://github.com/projectdiscovery/subfinder)
+
 ```bash
 # Subfinder, use -silent to only have subdomains in the output
 ./subfinder-linux-amd64 -d tesla.com [-silent]
 ```
+
 * [**findomain**](https://github.com/Edu4rdSHL/findomain/)
+
 ```bash
 # findomain, use -silent to only have subdomains in the output
 ./findomain-linux -t tesla.com [--quiet]
 ```
+
 * [**OneForAll**](https://github.com/shmilylty/OneForAll/tree/master/docs/en-us)
+
 ```bash
 python3 oneforall.py --target tesla.com [--dns False] [--req False] [--brute False] run
 ```
+
 * [**assetfinder**](https://github.com/tomnomnom/assetfinder)
+
 ```bash
 assetfinder --subs-only <domain>
 ```
+
 * [**Sudomy**](https://github.com/Screetsec/Sudomy)
+
 ```bash
 # It requires that you create a sudomy.api file with API keys
 sudomy -d tesla.com
 ```
+
 * [**vita**](https://github.com/junnlikestea/vita)
+
 ```
 vita -d tesla.com
 ```
+
 * [**theHarvester**](https://github.com/laramies/theHarvester)
+
 ```bash
 theHarvester -d tesla.com -b "anubis, baidu, bing, binaryedge, bingapi, bufferoverun, censys, certspotter, crtsh, dnsdumpster, duckduckgo, fullhunt, github-code, google, hackertarget, hunter, intelx, linkedin, linkedin_links, n45ht, omnisint, otx, pentesttools, projectdiscovery, qwant, rapiddns, rocketreach, securityTrails, spyse, sublist3r, threatcrowd, threatminer, trello, twitter, urlscan, virustotal, yahoo, zoomeye"
 ```
+
 Hay **otras herramientas/APIs interesantes** que, aunque no están directamente especializadas en encontrar subdominios, podrían ser útiles para encontrarlos, como:
 
 * [**Crobat**](https://github.com/cgboal/sonarsearch)**:** Utiliza la API [https://sonar.omnisint.io](https://sonar.omnisint.io) para obtener subdominios
+
 ```bash
 # Get list of subdomains in output from the API
 ## This is the API the crobat tool will use
 curl https://sonar.omnisint.io/subdomains/tesla.com | jq -r ".[]"
 ```
+
 * [**JLDC free API**](https://jldc.me/anubis/subdomains/google.com)
+
 ```bash
 curl https://jldc.me/anubis/subdomains/tesla.com | jq -r ".[]"
 ```
+
 * [**RapidDNS**](https://rapiddns.io) API gratuita
+
 ```bash
 # Get Domains from rapiddns free API
 rapiddns(){
@@ -297,7 +310,9 @@ curl -s "https://rapiddns.io/subdomain/$1?full=1" \
 }
 rapiddns tesla.com
 ```
+
 * [**https://crt.sh/**](https://crt.sh)
+
 ```bash
 # Get Domains from crt free API
 crt(){
@@ -307,12 +322,16 @@ curl -s "https://crt.sh/?q=%25.$1" \
 }
 crt tesla.com
 ```
+
 * [**gau**](https://github.com/lc/gau)**:** recupera URLs conocidas de Open Threat Exchange de AlienVault, la Wayback Machine y Common Crawl para cualquier dominio dado.
+
 ```bash
 # Get subdomains from GAUs found URLs
 gau --subs tesla.com | cut -d "/" -f 3 | sort -u
 ```
+
 * [**SubDomainizer**](https://github.com/nsonaniya2010/SubDomainizer) **y** [**subscraper**](https://github.com/Cillian-Collins/subscraper): Buscan en la web archivos JS y extraen subdominios de allí.
+
 ```bash
 # Get only subdomains from SubDomainizer
 python3 SubDomainizer.py -u https://tesla.com | grep tesla.com
@@ -320,23 +339,30 @@ python3 SubDomainizer.py -u https://tesla.com | grep tesla.com
 # Get only subdomains from subscraper, this already perform recursion over the found results
 python subscraper.py -u tesla.com | grep tesla.com | cut -d " " -f
 ```
+
 * [**Shodan**](https://www.shodan.io/)
+
 ```bash
 # Get info about the domain
 shodan domain <domain>
 # Get other pages with links to subdomains
 shodan search "http.html:help.domain.com"
 ```
+
 * [**Censys subdomain finder**](https://github.com/christophetd/censys-subdomain-finder)
+
 ```bash
 export CENSYS_API_ID=...
 export CENSYS_API_SECRET=...
 python3 censys-subdomain-finder.py tesla.com
 ```
+
 * [**DomainTrail.py**](https://github.com/gatete/DomainTrail)
+
 ```bash
 python3 DomainTrail.py -d example.com
 ```
+
 * [**securitytrails.com**](https://securitytrails.com/) tiene una API gratuita para buscar subdominios e historial de IP
 * [**chaos.projectdiscovery.io**](https://chaos.projectdiscovery.io/#/)
 
@@ -361,69 +387,93 @@ Y también IPs de buenos resolutores DNS. Para generar una lista de resolutores 
 Las herramientas más recomendadas para fuerza bruta DNS son:
 
 * [**massdns**](https://github.com/blechschmidt/massdns): Esta fue la primera herramienta que realizó una fuerza bruta DNS efectiva. Es muy rápida, sin embargo, es propensa a falsos positivos.
+
 ```bash
 sed 's/$/.domain.com/' subdomains.txt > bf-subdomains.txt
 ./massdns -r resolvers.txt -w /tmp/results.txt bf-subdomains.txt
 grep -E "tesla.com. [0-9]+ IN A .+" /tmp/results.txt
 ```
+
 * [**gobuster**](https://github.com/OJ/gobuster): Este creo que solo usa 1 resolutor
+
 ```
 gobuster dns -d mysite.com -t 50 -w subdomains.txt
 ```
+
 * [**shuffledns**](https://github.com/projectdiscovery/shuffledns) es un envoltorio alrededor de `massdns`, escrito en go, que te permite enumerar subdominios válidos utilizando un ataque de fuerza bruta activa, así como resolver subdominios con manejo de comodines y soporte fácil de entrada-salida.
+
 ```
 shuffledns -d example.com -list example-subdomains.txt -r resolvers.txt
 ```
+
 * [**puredns**](https://github.com/d3mondev/puredns): También utiliza `massdns`.
+
 ```
 puredns bruteforce all.txt domain.com
 ```
+
 * [**aiodnsbrute**](https://github.com/blark/aiodnsbrute) utiliza asyncio para forzar nombres de dominio de manera asíncrona.
+
 ```
 aiodnsbrute -r resolvers -w wordlist.txt -vv -t 1024 domain.com
 ```
+
 ### Segunda Ronda de Fuerza Bruta DNS
 
 Después de haber encontrado subdominios utilizando fuentes abiertas y fuerza bruta, podrías generar alteraciones de los subdominios encontrados para intentar encontrar aún más. Varios herramientas son útiles para este propósito:
 
 * [**dnsgen**](https://github.com/ProjectAnte/dnsgen)**:** Dadas las dominios y subdominios, genera permutaciones.
+
 ```bash
 cat subdomains.txt | dnsgen -
 ```
+
 * [**goaltdns**](https://github.com/subfinder/goaltdns): Dado los dominios y subdominios, genera permutaciones.
 * Puedes obtener la **wordlist** de permutaciones de goaltdns **aquí** [**here**](https://github.com/subfinder/goaltdns/blob/master/words.txt).
+
 ```bash
 goaltdns -l subdomains.txt -w /tmp/words-permutations.txt -o /tmp/final-words-s3.txt
 ```
+
 * [**gotator**](https://github.com/Josue87/gotator)**:** Dado los dominios y subdominios, genera permutaciones. Si no se indica un archivo de permutaciones, gotator usará uno propio.
+
 ```
 gotator -sub subdomains.txt -silent [-perm /tmp/words-permutations.txt]
 ```
+
 * [**altdns**](https://github.com/infosec-au/altdns): Aparte de generar permutaciones de subdominios, también puede intentar resolverlos (pero es mejor usar las herramientas comentadas anteriormente).
 * Puedes obtener las permutaciones de altdns **wordlist** en [**aquí**](https://github.com/infosec-au/altdns/blob/master/words.txt).
+
 ```
 altdns -i subdomains.txt -w /tmp/words-permutations.txt -o /tmp/asd3
 ```
+
 * [**dmut**](https://github.com/bp0lr/dmut): Otra herramienta para realizar permutaciones, mutaciones y alteraciones de subdominios. Esta herramienta realizará un ataque de fuerza bruta al resultado (no soporta comodines DNS).
 * Puedes obtener la lista de palabras de permutaciones de dmut [**aquí**](https://raw.githubusercontent.com/bp0lr/dmut/main/words.txt).
+
 ```bash
 cat subdomains.txt | dmut -d /tmp/words-permutations.txt -w 100 \
 --dns-errorLimit 10 --use-pb --verbose -s /tmp/resolvers-trusted.txt
 ```
+
 * [**alterx**](https://github.com/projectdiscovery/alterx)**:** Basado en un dominio, **genera nuevos nombres de subdominios potenciales** basados en patrones indicados para intentar descubrir más subdominios.
 
 #### Generación de permutaciones inteligentes
 
 * [**regulator**](https://github.com/cramppet/regulator): Para más información, lee este [**post**](https://cramppet.github.io/regulator/index.html), pero básicamente obtendrá las **partes principales** de los **subdominios descubiertos** y las mezclará para encontrar más subdominios.
+
 ```bash
 python3 main.py adobe.com adobe adobe.rules
 make_brute_list.sh adobe.rules adobe.brute
 puredns resolve adobe.brute --write adobe.valid
 ```
+
 * [**subzuf**](https://github.com/elceef/subzuf)**:** _subzuf_ es un fuzzer de fuerza bruta de subdominios acoplado con un algoritmo guiado por respuestas DNS inmensamente simple pero efectivo. Utiliza un conjunto de datos de entrada proporcionado, como una lista de palabras personalizada o registros DNS/TLS históricos, para sintetizar con precisión más nombres de dominio correspondientes y expandirlos aún más en un bucle basado en la información recopilada durante el escaneo DNS.
+
 ```
 echo www | subzuf facebook.com
 ```
+
 ### **Flujo de Trabajo de Descubrimiento de Subdominios**
 
 Consulta esta publicación de blog que escribí sobre cómo **automatizar el descubrimiento de subdominios** de un dominio utilizando **flujos de trabajo de Trickest** para no tener que lanzar manualmente un montón de herramientas en mi computadora:
@@ -443,6 +493,7 @@ Puedes encontrar algunos **VHosts en IPs usando** [**HostHunter**](https://githu
 **Fuerza Bruta**
 
 Si sospechas que algún subdominio puede estar oculto en un servidor web, podrías intentar forzarlo:
+
 ```bash
 ffuf -c -w /path/to/wordlist -u http://victim.com -H "Host: FUZZ.victim.com"
 
@@ -456,6 +507,7 @@ vhostbrute.py --url="example.com" --remoteip="10.1.1.15" --base="www.example.com
 #https://github.com/codingo/VHostScan
 VHostScan -t example.com
 ```
+
 {% hint style="info" %}
 Con esta técnica, incluso podrías acceder a puntos finales internos/ocultos.
 {% endhint %}
@@ -463,9 +515,11 @@ Con esta técnica, incluso podrías acceder a puntos finales internos/ocultos.
 ### **Fuerza Bruta de CORS**
 
 A veces encontrarás páginas que solo devuelven el encabezado _**Access-Control-Allow-Origin**_ cuando se establece un dominio/subdominio válido en el encabezado _**Origin**_. En estos escenarios, puedes abusar de este comportamiento para **descubrir** nuevos **subdominios**.
+
 ```bash
 ffuf -w subdomains-top1million-5000.txt -u http://10.10.10.208 -H 'Origin: http://FUZZ.crossfit.htb' -mr "Access-Control-Allow-Origin" -ignore-body
 ```
+
 ### **Fuerza Bruta de Buckets**
 
 Mientras buscas **subdominios**, presta atención para ver si está **apuntando** a algún tipo de **bucket**, y en ese caso [**verifica los permisos**](../../network-services-pentesting/pentesting-web/buckets/)**.**\
@@ -510,10 +564,12 @@ Por favor, ten en cuenta que esto estará **orientado a la descubrimiento de apl
 
 Un **método rápido** para descubrir **puertos abiertos** relacionados con **servidores** web usando [**masscan** se puede encontrar aquí](../pentesting-network/#http-port-discovery).\
 Otra herramienta amigable para buscar servidores web es [**httprobe**](https://github.com/tomnomnom/httprobe)**,** [**fprobe**](https://github.com/theblackturtle/fprobe) y [**httpx**](https://github.com/projectdiscovery/httpx). Solo pasas una lista de dominios y tratará de conectarse al puerto 80 (http) y 443 (https). Además, puedes indicar que intente otros puertos:
+
 ```bash
 cat /tmp/domains.txt | httprobe #Test all domains inside the file for port 80 and 443
 cat /tmp/domains.txt | httprobe -p http:8080 -p https:8443 #Check port 80, 443 and 8080 and 8443
 ```
+
 ### **Capturas de pantalla**
 
 Ahora que has descubierto **todos los servidores web** presentes en el alcance (entre las **IPs** de la empresa y todos los **dominios** y **subdominios**) probablemente **no sepas por dónde empezar**. Así que, hagámoslo simple y comencemos tomando capturas de pantalla de todos ellos. Solo con **echar un vistazo** a la **página principal** puedes encontrar **puntos finales extraños** que son más **propensos** a ser **vulnerables**.
@@ -656,8 +712,8 @@ Si estás interesado en una **carrera de hacking** y hackear lo inhackeable - **
 {% embed url="https://www.stmcyber.com/careers" %}
 
 {% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+Aprende y practica Hacking en AWS:<img src="../../.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="../../.gitbook/assets/arte.png" alt="" data-size="line">\
+Aprende y practica Hacking en GCP: <img src="../../.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="../../.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
