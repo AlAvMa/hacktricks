@@ -1,34 +1,19 @@
-# Metodología de Phishing
-
-{% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
-
-<details>
-
-<summary>Apoya a HackTricks</summary>
-
-* Revisa los [**planes de suscripción**](https://github.com/sponsors/carlospolop)!
-* **Únete al** 💬 [**grupo de Discord**](https://discord.gg/hRep4RUj7f) o al [**grupo de telegram**](https://t.me/peass) o **síguenos** en **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
-* **Comparte trucos de hacking enviando PRs a los** [**HackTricks**](https://github.com/carlospolop/hacktricks) y [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) repos de github.
-
-</details>
-{% endhint %}
+# Phishing Methodology
 
 ## Metodología
 
 1. Reconocer a la víctima
-1. Seleccionar el **dominio de la víctima**.
-2. Realizar una enumeración web básica **buscando portales de inicio de sesión** utilizados por la víctima y **decidir** cuál vas a **suplantar**.
-3. Usar **OSINT** para **encontrar correos electrónicos**.
-2. Preparar el entorno
-1. **Comprar el dominio** que vas a usar para la evaluación de phishing.
-2. **Configurar el servicio de correo** relacionado (SPF, DMARC, DKIM, rDNS).
-3. Configurar el VPS con **gophish**.
-3. Preparar la campaña
-1. Preparar la **plantilla de correo electrónico**.
-2. Preparar la **página web** para robar las credenciales.
-4. ¡Lanzar la campaña!
+2. Seleccionar el **dominio de la víctima**.
+3. Realizar una enumeración web básica **buscando portales de inicio de sesión** utilizados por la víctima y **decidir** cuál vas a **suplantar**.
+4. Usar **OSINT** para **encontrar correos electrónicos**.
+5. Preparar el entorno
+6. **Comprar el dominio** que vas a usar para la evaluación de phishing.
+7. **Configurar el servicio de correo** relacionado (SPF, DMARC, DKIM, rDNS).
+8. Configurar el VPS con **gophish**.
+9. Preparar la campaña
+10. Preparar la **plantilla de correo electrónico**.
+11. Preparar la **página web** para robar las credenciales.
+12. ¡Lanzar la campaña!
 
 ## Generar nombres de dominio similares o comprar un dominio de confianza
 
@@ -97,14 +82,17 @@ Puedes descargarlo de [https://github.com/gophish/gophish/releases/tag/v0.11.0](
 
 Descarga y descomprime dentro de `/opt/gophish` y ejecuta `/opt/gophish/gophish`\
 Se te dará una contraseña para el usuario administrador en el puerto 3333 en la salida. Por lo tanto, accede a ese puerto y usa esas credenciales para cambiar la contraseña del administrador. Puede que necesites tunelizar ese puerto a local:
+
 ```bash
 ssh -L 3333:127.0.0.1:3333 <user>@<ip>
 ```
+
 ### Configuración
 
 **Configuración del certificado TLS**
 
 Antes de este paso, deberías haber **comprado ya el dominio** que vas a usar y debe estar **apuntando** a la **IP del VPS** donde estás configurando **gophish**.
+
 ```bash
 DOMAIN="<domain>"
 wget https://dl.eff.org/certbot-auto
@@ -120,6 +108,7 @@ mkdir /opt/gophish/ssl_keys
 cp "/etc/letsencrypt/live/$DOMAIN/privkey.pem" /opt/gophish/ssl_keys/key.pem
 cp "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" /opt/gophish/ssl_keys/key.crt​
 ```
+
 **Configuración del correo**
 
 Comienza instalando: `apt-get install postfix`
@@ -140,14 +129,17 @@ Finalmente, modifica los archivos **`/etc/hostname`** y **`/etc/mailname`** a tu
 Ahora, crea un **registro A de DNS** de `mail.<domain>` apuntando a la **dirección IP** del VPS y un **registro MX de DNS** apuntando a `mail.<domain>`
 
 Ahora probemos enviar un correo electrónico:
+
 ```bash
 apt install mailutils
 echo "This is the body of the email" | mail -s "This is the subject line" test@email.com
 ```
+
 **Configuración de Gophish**
 
 Detén la ejecución de gophish y configuremoslo.\
 Modifica `/opt/gophish/config.json` a lo siguiente (nota el uso de https):
+
 ```bash
 {
 "admin_server": {
@@ -172,9 +164,11 @@ Modifica `/opt/gophish/config.json` a lo siguiente (nota el uso de https):
 }
 }
 ```
+
 **Configurar el servicio gophish**
 
 Para crear el servicio gophish de modo que se inicie automáticamente y se gestione como un servicio, puedes crear el archivo `/etc/init.d/gophish` con el siguiente contenido:
+
 ```bash
 #!/bin/bash
 # /etc/init.d/gophish
@@ -221,7 +215,9 @@ case $1 in
 start|stop|status) "$1" ;;
 esac
 ```
+
 Finaliza la configuración del servicio y verifica que funcione:
+
 ```bash
 mkdir /var/log/gophish
 chmod +x /etc/init.d/gophish
@@ -232,6 +228,7 @@ service gophish status
 ss -l | grep "3333\|443"
 service gophish stop
 ```
+
 ## Configurando el servidor de correo y el dominio
 
 ### Espera y sé legítimo
@@ -253,17 +250,21 @@ Puedes usar [https://www.spfwizard.net/](https://www.spfwizard.net) para generar
 ![](<../../.gitbook/assets/image (1037).png>)
 
 Este es el contenido que debe establecerse dentro de un registro TXT dentro del dominio:
+
 ```bash
 v=spf1 mx a ip4:ip.ip.ip.ip ?all
 ```
+
 ### Registro de Autenticación, Informe y Conformidad de Mensajes Basado en Dominio (DMARC)
 
 Debes **configurar un registro DMARC para el nuevo dominio**. Si no sabes qué es un registro DMARC [**lee esta página**](../../network-services-pentesting/pentesting-smtp/#dmarc).
 
 Tienes que crear un nuevo registro DNS TXT apuntando al nombre de host `_dmarc.<domain>` con el siguiente contenido:
+
 ```bash
 v=DMARC1; p=none
 ```
+
 ### DomainKeys Identified Mail (DKIM)
 
 Debes **configurar un DKIM para el nuevo dominio**. Si no sabes qué es un registro DMARC [**lee esta página**](../../network-services-pentesting/pentesting-smtp/#dkim).
@@ -272,6 +273,7 @@ Este tutorial se basa en: [https://www.digitalocean.com/community/tutorials/how-
 
 {% hint style="info" %}
 Necesitas concatenar ambos valores B64 que genera la clave DKIM:
+
 ```
 v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0wPibdqPtzYk81njjQCrChIcHzxOp8a1wjbsoNtka2X9QXCZs+iXkvw++QsWDtdYu3q0Ofnr0Yd/TmG/Y2bBGoEgeE+YTUG2aEgw8Xx42NLJq2D1pB2lRQPW4IxefROnXu5HfKSm7dyzML1gZ1U0pR5X4IZCH0wOPhIq326QjxJZm79E1nTh3xj" "Y9N/Dt3+fVnIbMupzXE216TdFuifKM6Tl6O/axNsbswMS1TH812euno8xRpsdXJzFlB9q3VbMkVWig4P538mHolGzudEBg563vv66U8D7uuzGYxYT4WS8NVm3QBMg0QKPWZaKp+bADLkOSB9J2nUpk4Aj9KB5swIDAQAB
 ```
@@ -281,11 +283,14 @@ v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0wPibdqP
 
 Puedes hacerlo usando [https://www.mail-tester.com/](https://www.mail-tester.com)\
 Simplemente accede a la página y envía un correo electrónico a la dirección que te proporcionen:
+
 ```bash
 echo "This is the body of the email" | mail -s "This is the subject line" test-iimosa79z@srv1.mail-tester.com
 ```
+
 Puedes también **verificar tu configuración de correo** enviando un correo a `check-auth@verifier.port25.com` y **leyendo la respuesta** (para esto necesitarás **abrir** el puerto **25** y ver la respuesta en el archivo _/var/mail/root_ si envías el correo como root).\
 Verifica que pases todas las pruebas:
+
 ```bash
 ==========================================================
 Summary of Results
@@ -296,12 +301,15 @@ DKIM check:         pass
 Sender-ID check:    pass
 SpamAssassin check: ham
 ```
+
 También podrías enviar **un mensaje a un Gmail bajo tu control** y verificar los **encabezados del correo electrónico** en tu bandeja de entrada de Gmail, `dkim=pass` debería estar presente en el campo de encabezado `Authentication-Results`.
+
 ```
 Authentication-Results: mx.google.com;
 spf=pass (google.com: domain of contact@example.com designates --- as permitted sender) smtp.mail=contact@example.com;
 dkim=pass header.i=@example.com;
 ```
+
 ### ​Eliminación de la lista negra de Spamhouse
 
 La página [www.mail-tester.com](https://www.mail-tester.com) puede indicarte si tu dominio está siendo bloqueado por spamhouse. Puedes solicitar la eliminación de tu dominio/IP en: ​[https://www.spamhaus.org/lookup/](https://www.spamhaus.org/lookup/)
@@ -331,6 +339,7 @@ Recomendaría **enviar los correos de prueba a direcciones de 10min** para evita
 * Luego escribe un **asunto** (nada extraño, solo algo que podrías esperar leer en un correo electrónico regular)
 * Asegúrate de haber marcado "**Agregar imagen de seguimiento**"
 * Escribe la **plantilla de correo electrónico** (puedes usar variables como en el siguiente ejemplo):
+
 ```markup
 <html>
 <head>
@@ -349,6 +358,7 @@ WRITE HERE SOME SIGNATURE OF SOMEONE FROM THE COMPANY
 </body>
 </html>
 ```
+
 Note that **para aumentar la credibilidad del correo electrónico**, se recomienda usar alguna firma de un correo del cliente. Sugerencias:
 
 * Enviar un correo a una **dirección no existente** y verificar si la respuesta tiene alguna firma.
@@ -450,7 +460,7 @@ Puedes **comprar un dominio con un nombre muy similar** al dominio de la víctim
 
 ### Evaluar el phishing
 
-Usa [**Phishious** ](https://github.com/Rices/Phishious) para evaluar si tu correo terminará en la carpeta de spam o si será bloqueado o exitoso.
+Usa [**Phishious** ](https://github.com/Rices/Phishious)para evaluar si tu correo terminará en la carpeta de spam o si será bloqueado o exitoso.
 
 ## Referencias
 
@@ -458,18 +468,3 @@ Usa [**Phishious** ](https://github.com/Rices/Phishious) para evaluar si tu corr
 * [https://0xpatrik.com/phishing-domains/](https://0xpatrik.com/phishing-domains/)
 * [https://darkbyte.net/robando-sesiones-y-bypasseando-2fa-con-evilnovnc/](https://darkbyte.net/robando-sesiones-y-bypasseando-2fa-con-evilnovnc/)
 * [https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-dkim-with-postfix-on-debian-wheezy](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-dkim-with-postfix-on-debian-wheezy)
-
-{% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
-
-<details>
-
-<summary>Apoya a HackTricks</summary>
-
-* Consulta los [**planes de suscripción**](https://github.com/sponsors/carlospolop)!
-* **Únete al** 💬 [**grupo de Discord**](https://discord.gg/hRep4RUj7f) o al [**grupo de telegram**](https://t.me/peass) o **síguenos** en **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
-* **Comparte trucos de hacking enviando PRs a los** [**HackTricks**](https://github.com/carlospolop/hacktricks) y [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) repositorios de github.
-
-</details>
-{% endhint %}
